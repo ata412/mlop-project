@@ -5,6 +5,8 @@ RUN npm install
 COPY . .
 ARG API_URL=http://localhost:7860
 ENV API_URL=$API_URL
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 RUN npm run build
 EXPOSE 3000
 CMD ["npm", "start"]
