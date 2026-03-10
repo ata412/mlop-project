@@ -2,7 +2,7 @@
 # Cloud / Linux deployment — vLLM CUDA inference (GPU required).
 # Mac M-series users: run natively (MLX gives GPU acceleration, Docker won't).
 
-FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
 # ── System dependencies ────────────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,7 +21,7 @@ WORKDIR /app
 
 # ── Python dependencies ────────────────────────────────────────────────────────
 # vLLM stable — includes torch, transformers, accelerate
-RUN pip install --no-cache-dir vllm
+RUN pip install --no-cache-dir --timeout 300 vllm
 
 # Core pipeline packages
 RUN pip install --no-cache-dir \

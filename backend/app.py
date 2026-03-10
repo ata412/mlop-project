@@ -12,6 +12,11 @@ Open:  http://localhost:7860
 Author: ZoonoticSense Team
 """
 
+import os
+# vLLM v1 on T4 (cc=7.5): disable FlashInfer, use XFormers attention
+os.environ.setdefault("VLLM_ATTENTION_BACKEND", "XFORMERS")
+os.environ.setdefault("VLLM_V1_ENABLED", "0")
+
 import multiprocessing as _mp
 
 import os, re, json, base64, tempfile, threading, time, queue, logging, subprocess, shutil, asyncio, uuid
@@ -234,7 +239,7 @@ else:
         async def _create_engine():
             return AsyncLLMEngine.from_engine_args(_eargs)
 
-        llm = _asyncio.run_coroutine_threadsafe(_create_engine(), _vllm_loop).result(timeout=300)
+        llm = _asyncio.run_coroutine_threadsafe(_create_engine(), _vllm_loop).result(timeout=600)
 
         def _run_async(coro):
             return _asyncio.run_coroutine_threadsafe(coro, _vllm_loop).result()
