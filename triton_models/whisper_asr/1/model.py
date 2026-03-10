@@ -12,11 +12,11 @@ class TritonPythonModel:
         model_config = json.loads(args['model_config'])
         params = model_config.get('parameters', {})
         size = params.get('whisper_size', {}).get('string_value', 'base')
-        self.model = whisper.load_model(size, device='cpu')
+        self.model = whisper.load_model(size, device='cuda')
         self.model_th = hf_pipeline(
             'automatic-speech-recognition',
             model='nectec/Pathumma-whisper-th-medium',
-            device='cpu',
+            device='cuda',
         )
 
     def execute(self, requests):

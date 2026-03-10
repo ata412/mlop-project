@@ -101,7 +101,7 @@ if USE_TRITON:
 
     def _triton_client():
         """Create a fresh per-call client to avoid gevent cross-thread errors."""
-        return _triton_http.InferenceServerClient(url=TRITON_URL)
+        return _triton_http.InferenceServerClient(url=TRITON_URL, network_timeout=120.0)
 
     class TritonEmbedder:
         """Drop-in replacement for SentenceTransformer — calls Triton sentence_embedder."""
@@ -121,7 +121,7 @@ if USE_TRITON:
         inp = _triton_http.InferInput('wav_bytes', [1], 'BYTES')
         inp.set_data_from_numpy(np.array([wav_bytes], dtype=object))
         out = _triton_http.InferRequestedOutput('transcript')
-        resp = _triton_client().infer('whisper_asr', inputs=[inp], outputs=[out])
+        resp = _triton_client().infer('whisper_asr', inputs=[inp], outputs=[out], client_timeout=120)
         return resp.as_numpy('transcript').flatten()[0].decode('utf-8')
 
     def _synth_triton(text: str, voice: str) -> str | None:
