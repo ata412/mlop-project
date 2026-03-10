@@ -9,7 +9,7 @@ import os
 
 class TritonPythonModel:
     def initialize(self, args):
-        self.pipe = KPipeline(lang_code='a', device='cpu')
+        self.pipe = KPipeline(lang_code='a', device='cuda')
 
     def execute(self, requests):
         responses = []
