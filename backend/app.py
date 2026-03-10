@@ -221,7 +221,7 @@ else:
             model=LLM_MODEL,
             dtype="float16",
             max_model_len=1024,
-            gpu_memory_utilization=0.85,
+            gpu_memory_utilization=0.60,
         )
         LLM_BACKEND = "vllm [CUDA+compressed-tensors]"
     else:
