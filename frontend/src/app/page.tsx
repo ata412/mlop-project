@@ -352,7 +352,7 @@ export default function LandingPage() {
         </section>
 
         <footer className={styles.footer}>
-          <span>ZoonoMoE v2.0 · MLX · Qwen3 · Kokoro · FAISS</span>
+          <span>ZoonoMoE v.3 toey edition · MLX · Qwen3 · Kokoro · FAISS</span>
           <span>GitHub · MLOps Project</span>
         </footer>
       </div>

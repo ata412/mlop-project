@@ -99,3 +99,9 @@
   background: var(--surface1);
   flex-shrink: 0;
 }
+
+@media (max-width: 640px) {
+  .detail { display: none; }
+  .step { padding: 5px 8px; }
+  .connector { width: 8px; }
+}

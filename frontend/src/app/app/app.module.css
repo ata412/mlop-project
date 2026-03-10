@@ -306,4 +306,16 @@
   color: var(--muted);
   padding-top: 8px;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .header { padding: 10px 16px; }
+  .appSub { display: none; }
+  .statusText { display: none; }
+  .main { padding: 16px 12px 28px; gap: 14px; }
+  .textRow { flex-direction: column; }
+  .analyzeBtn { align-self: stretch; }
+  .footer { flex-direction: column; align-items: center; gap: 6px; }
 }

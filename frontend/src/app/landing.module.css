@@ -629,10 +629,26 @@
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 640px) {
   .nav { padding: 14px 20px; }
-  .pipelineFlow { flex-wrap: wrap; gap: 16px; }
+  .navLink { display: none; }
+  .hero { padding: 100px 16px 60px; }
+  .heroTitle { letter-spacing: -2px; text-align: center; }
+  .pipelineFlow { flex-wrap: wrap; gap: 16px; justify-content: center; }
   .plConnector { display: none; }
+  .plTip { width: 160px; font-size: 10px; }
   .statsStrip { margin-top: 48px; }
   .statItem { padding: 14px 20px; }
   .section { padding: 60px 20px; }
-  .heroTitle { letter-spacing: -2px; }
+  .pipelineSection { padding: 60px 20px 80px; }
+  .ctaBanner { padding: 60px 20px; }
+  .ctaGlow { width: 300px; height: 150px; }
+  .footer { flex-direction: column; text-align: center; padding: 20px; gap: 6px; }
+}
+
+@media (max-width: 400px) {
+  .navPill { display: none; }
+  .hero { padding: 86px 16px 48px; }
+  .statItem { padding: 10px 14px; }
+  .statNum { font-size: 24px; }
+  .statDivider { display: none; }
+  .statsStrip { flex-wrap: wrap; justify-content: center; }
 }
