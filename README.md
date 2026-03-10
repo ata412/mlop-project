@@ -60,7 +60,8 @@ Voice / Text
 | Platform | ASR | LLM | TTS | Inference |
 |---|---|---|---|---|
 | Apple Silicon (Mac M-series) | mlx-whisper | mlx-lm Qwen3-4B | Kokoro local pool | MLX |
-| Linux + NVIDIA GPU | Whisper + Pathumma-th via **Triton** | vLLM + CUDA fp8 | Kokoro via **Triton** | Triton + vLLM |
+| Linux + NVIDIA GPU (cc≥8.0) | Whisper + Pathumma-th via **Triton** | vLLM + CUDA fp16 + compressed-tensors | Kokoro via **Triton** | Triton + vLLM |
+| Linux + NVIDIA GPU (T4/cc=7.5) | Whisper + Pathumma-th via **Triton** | vLLM + CUDA fp16 (AWQ 8-bit) | Kokoro via **Triton** | Triton + vLLM |
 | Linux CPU only | Whisper + Pathumma-th | vLLM CPU | Kokoro local pool | vLLM |
 
 ---
@@ -238,7 +239,8 @@ train(model_dir=Path('models'), extra_data=Path('data/router_training.jsonl'))
 | Platform | Model | Backend |
 |---|---|---|
 | Apple Silicon | `mlx-community/Qwen3-4B-4bit` | mlx-lm |
-| CUDA | `Qwen/Qwen3-4B` fp8 | vLLM |
+| CUDA (cc≥8.0) | `Qwen/Qwen3-4B` fp16 | vLLM |
+| CUDA T4 (cc=7.5) | `cyankiwi/Qwen3-4B-Instruct-2507-AWQ-8bit` | vLLM + compressed-tensors |
 | CPU | `Qwen/Qwen2.5-1.5B-Instruct` | vLLM |
 
 - Domain-specific expert persona + NER fields + RAG context
@@ -334,6 +336,7 @@ MLOps_Project/
 | `PORT` | `7860` | Backend port |
 | `DEBUG` | `false` | FastAPI debug mode |
 | `DISCORD_WEBHOOK` | _(empty)_ | Discord Forum webhook for pipeline logging |
+| `DATABASE_URL` | _(empty)_ | PostgreSQL connection string (Neon) |
 
 ---
 
@@ -343,8 +346,8 @@ MLOps_Project/
 # GPU (Triton enabled)
 docker compose up --build
 
-# With Discord logging
-DISCORD_WEBHOOK="https://discord.com/api/webhooks/..." docker compose up --build
+# With Discord logging + Database
+DATABASE_URL="postgresql://..." DISCORD_WEBHOOK="https://discord.com/api/webhooks/..." docker compose up --build
 ```
 
 Persisted volumes:
@@ -354,7 +357,31 @@ Persisted volumes:
 | `./backend/knowledge_base` | RAG FAISS indexes |
 | `./backend/models` | Trained MLP router |
 | `./backend/data` | Router training data |
-| `./triton_models` | Triton model repository |
+| `huggingface_cache` | Downloaded HuggingFace models |
+
+> **Note:** `triton_models/` is baked into the Triton Docker image via `COPY triton_models /models` — no bind mount required.
+
+---
+
+## Google Cloud Deployment (GPU VM)
+
+```bash
+# 1. Build + push images
+gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+docker compose build
+docker tag zoonmoe-backend:latest asia-southeast1-docker.pkg.dev/<PROJECT_ID>/zoonotic/backend:latest
+docker tag zoonmoe-triton:latest  asia-southeast1-docker.pkg.dev/<PROJECT_ID>/zoonotic/triton:latest
+docker tag zoonmoe-frontend:latest asia-southeast1-docker.pkg.dev/<PROJECT_ID>/zoonotic/frontend:latest
+docker push asia-southeast1-docker.pkg.dev/<PROJECT_ID>/zoonotic/backend:latest
+docker push asia-southeast1-docker.pkg.dev/<PROJECT_ID>/zoonotic/triton:latest
+docker push asia-southeast1-docker.pkg.dev/<PROJECT_ID>/zoonotic/frontend:latest
+
+# 2. On VM — pull and run
+docker compose pull
+DATABASE_URL="postgresql://..." docker compose up -d
+```
+
+Requirements: NVIDIA driver ≥ 590, `nvidia-container-toolkit`, GPU with ≥ 16 GB VRAM (T4 or better).
 
 ---
 
@@ -403,6 +430,8 @@ python3 backend/scripts/discord_logger.py   # dry-run test
 | Inference Server | NVIDIA Triton 26.02 (ASR + Embedder + TTS) |
 | Backend | FastAPI + SSE streaming |
 | Frontend | Next.js 15 + Three.js / R3F |
+| Database | Neon PostgreSQL — SQLAlchemy (backend) + Drizzle ORM (frontend) |
+| Dashboard | Next.js `/dashboard` — report history, stats, risk distribution |
 | Experiment Tracking | discordflow — team-built Discord Forum ML logger |
 
 ---
